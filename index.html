@@ -3,9 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <title>Test Demo</title>
+  <style type="text/css">
+    #canvas {
+      padding: 8px;
+      box-sizing: border-box;
+      max-width: 100%;
+      margin: auto;
+    }
+  </style>
 </head>
 <body>
+  <input type="number" id="imgWidth" placeholder="裁剪后图片宽度">
+  <input type="number" id="imgHeight" placeholder="裁剪后图片高度">
   <input type="file" name="file" accept="image/*">
-  <img src="https://github.com/smileyby/smartcrop.js/images/testImg.jpg" alt="">
+
+  <!-- 测试图片地址 -->
+  <!-- <img src="http://oqpmmru7y.bkt.clouddn.com/testImg.jpg" alt="joy" id="joy"> -->
+
+  <!-- 裁剪后用canvas画出来 -->
+  <h3>红色部分为裁剪区域</h3>
+  <div class="canvasBox">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script type="text/javascript" src=jquery.js></script>
+  <script type="text/javascript" src="smartcrop.js"></script>
+  <script type="text/javascript">
+  $(function(){
+    var img = '';
+    var canvas = $('#canvas').get(0);
+    var ctx = canvas.getContext('2d');
+
+    // 选中区域
+    var selectedCrop = '';
+    var options = {width: 100, height: 100, debug: true};
+
+    $('input[type=file]').change(function(e) {
+      var imgWidth = $('#imgWidth').val();
+      var imgHeight =  $('#imgHeight').val();
+      if(imgWidth && imgHeight){
+        options.width = imgWidth;
+        options.height = imgHeight;
+      }
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      if (files.length > 0) {
+        var file = files[0];
+        if (typeof FileReader !== 'undefined' && file.type.indexOf('image') != -1) {
+          var reader = new FileReader();
+          // Note: addEventListener doesn't work in Google Chrome for this event
+          reader.onload = function(evt) {
+            load(evt.target.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+
+    function load(src) {
+      img = new Image();
+      img.src = src;
+      img.onload = function() {
+        run(options);
+      };
+    }
+
+    function run(options) {
+      smartcrop.crop(img, options).then(function(result){
+        console.log(result);
+        selectedCrop = result.topCrop;
+        drawCrop(selectedCrop)
+      });
+    }
+
+    // 通过canvas红线框出来
+    function drawCrop(crop) {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(crop.x, crop.y, crop.width, crop.height);
+    }
+
+  });
+  </script>
 </body>
 </html>
