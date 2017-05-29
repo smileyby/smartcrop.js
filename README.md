@@ -40,6 +40,8 @@ function drawCrop(crop) {
 
 ### 测试结果
 
-*	在宽度很小，高度很大的时候裁剪不准确
+* 未开启`ruleOfThirds`时---在宽度很小，高度很大的时候裁剪不准确
+* smartcrop.js还可以借助第三方规则来实现准确的裁剪
+* 它还有很多参数可以配置，具体请参考[smartcrop.js](https://github.com/jwagner/smartcrop.js)
 
 现在只是实现了用`canvas`用红线把裁剪部分圈出来，但要怎么把圈出来的部分转换成另一张图片呢？这是一问题，带我研究出来在写在这里。主要是都是英文看着累啊。呜呜宝宝心里苦，宝宝要学英语
