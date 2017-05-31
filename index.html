@@ -4,11 +4,20 @@
   <meta charset="UTF-8">
   <title>Test Demo</title>
   <style type="text/css">
+    html, body {
+      padding: 20px;
+      background-color: #d0c0aa;
+    }
     #canvas {
       padding: 8px;
       box-sizing: border-box;
       max-width: 100%;
       margin: auto;
+    }
+    #cropBase {
+      width: 80%;
+      padding: 0 50px;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -16,14 +25,27 @@
   <input type="number" id="imgWidth" placeholder="裁剪后图片宽度">
   <input type="number" id="imgHeight" placeholder="裁剪后图片高度">
   <input type="file" name="file" accept="image/*">
+  <span>*这里的宽高比建议为1:1，这样裁剪的会更准确一些</span>
 
   <!-- 测试图片地址 -->
   <!-- <img src="http://oqpmmru7y.bkt.clouddn.com/testImg.jpg" alt="joy" id="joy"> -->
+
+  <h3>通过canvas裁剪后的图片</h3>
+  <div class="lastImg">
+    <canvas id="cropImg"></canvas>
+  </div>
 
   <!-- 裁剪后用canvas画出来 -->
   <h3>红色部分为裁剪区域</h3>
   <div class="canvasBox">
     <canvas id="canvas"></canvas>
+  </div>
+
+   <h3>转换成base64的裁剪后图片数据</h3>
+  <div class="base64">
+    <img src="" alt="cropImg" id="img">
+    <h5>base64数据：</h5>
+    <p id="cropBase"></p>
   </div>
 
   <script type="text/javascript" src=jquery.js></script>
@@ -32,21 +54,35 @@
   $(function(){
     var img = '';
     var canvas = $('#canvas').get(0);
+    var cropCanvas = $('#cropImg').get(0);
     var ctx = canvas.getContext('2d');
+    var cropCtx = cropCanvas.getContext('2d');
+
+    // 裁剪图片信息,默认裁剪大小为 80*80
+    var cropWidth = '';
+    var cropHeight = '';
 
     // 选中区域
     var selectedCrop = '';
-    var options = {width: 100, height: 100,minScale: 1, ruleOfThirds: true, debug: true};
+    var options = {
+      width: '',
+      height: '',
+      minScale: 1,
+      ruleOfThirds: true,
+      debug: true
+    };
 
     $('input[type=file]').change(function(e) {
-      var imgWidth = $('#imgWidth').val();
-      var imgHeight =  $('#imgHeight').val();
-      if(imgWidth && imgHeight){
-        options.width = imgWidth;
-        options.height = imgHeight;
-      }
+      cropWidth = judgeNumber($('#imgWidth').val());
+      cropHeight =  judgeNumber($('#imgHeight').val());
+      options.width = cropWidth;
+      options.height = cropHeight;
       handleFiles(this.files);
     });
+
+    function judgeNumber(value){
+      return Number(value) === 0? 80: Number(value);
+    }
 
     function handleFiles(files) {
       if (files.length > 0) {
@@ -72,9 +108,9 @@
 
     function run(options) {
       smartcrop.crop(img, options).then(function(result){
-        console.log(result);
         selectedCrop = result.topCrop;
-        drawCrop(selectedCrop)
+        drawCrop(selectedCrop);
+        drawImage(selectedCrop);
       });
     }
 
@@ -86,6 +122,16 @@
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 4;
       ctx.strokeRect(crop.x, crop.y, crop.width, crop.height);
+    }
+
+    // 画出裁剪后的图片
+    function drawImage(crop){
+      cropCanvas.width = cropWidth;
+      cropCanvas.height = cropHeight;
+      cropCtx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, cropWidth, cropHeight);
+      var src = cropCanvas.toDataURL("image/jpeg");
+      $('#img').attr('src', src);
+      $('#cropBase').html(src);
     }
 
   });
