@@ -53,5 +53,4 @@ function drawImage(crop){
 * smartcrop.js还可以借助第三方规则来实现准确的裁剪 [jQuery/Zepto facedetection](http://facedetection.jaysalvat.com/) [trackingjs](https://trackingjs.com/)
 * 它还有很多参数可以配置，具体请参考[smartcrop.js](https://github.com/jwagner/smartcrop.js)
 * 主要用到canvas的两个属性，具体请参考[drawImage MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage),[toDataURL MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLCanvasElement/toDataURL)
-
-## 实现区域选中，并下载裁剪后的图片
+* 最终将裁剪后的图片转成base输出
